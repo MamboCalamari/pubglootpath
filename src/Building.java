@@ -3,7 +3,7 @@ import java.util.HashMap;
 /**
  * Created by trsmith on 10/20/2017.
  */
-public class Building {
+public class Building{
 
     private int number;
     private int lootSpawns;
@@ -133,5 +133,15 @@ public class Building {
 
     public int getNumber() {
         return number;
+    }
+
+    @Override
+    public String toString() {
+        String result = number + " " + lootSpawns + " " + timeToLoot + "\n";
+        for(Integer number : neighbors.keySet())
+        {
+            result += number + " " + neighbors.get(number) + "\n";
+        }
+        return result;
     }
 }
