@@ -43,6 +43,36 @@ public class Algorithms {
         }
     }
 
+    public static void bestFirstTest(Building building, Path path, City city) {
+        ArrayList<Building> unvisitedNeighbors = new ArrayList<>();
+        for (Integer nextBuildingNum : building.getNeighbors().keySet()) {
+            if (!path.isAlreadyInPath(nextBuildingNum)) {
+                unvisitedNeighbors.add(city.getBuildingFromNumber(nextBuildingNum));
+            }
+        }
+
+        for (Building nextBuilding : unvisitedNeighbors) {
+            double newTimeSpent = path.getTotalTimeSpent() + building.getNeighbors().get(nextBuilding.getNumber()) + building.getTimeToLoot();
+            //best solution overall, stop here
+            if (newTimeSpent > maxSeconds) {
+                bestPath = path;
+                return;
+            } else {
+                ArrayList<Integer> newPathList = path.pathDeepCopy();
+                newPathList.add(nextBuilding.getNumber());
+                Path newPath = new Path(newPathList, newTimeSpent, path.getTotalLootSpawns() + nextBuilding.getLootSpawns());
+                pathEfficiencyQueue.add(newPath);
+            }
+        }
+
+        Path pathToVisit = pathEfficiencyQueue.poll();
+        //if queue is empty we cannot loot for the length specified
+        if (pathToVisit == null) {
+            return;
+        }
+        bestFirstTest(city.getBuildingFromNumber(pathToVisit.getLastBuildingNumInPath()), pathToVisit, city);
+    }
+
     public static void bestFirstVisit(Building building, Path path, City city) {
         ArrayList<Building> unvisitedNeighbors = new ArrayList<>();
         for (Integer nextBuildingNum : building.getNeighbors().keySet()) {
@@ -108,7 +138,6 @@ public class Algorithms {
         return false;
     }
 
-
     private static boolean checkIfBestPathBestFirst(Path path) {
         double pathEfficiency = path.getTotalLootSpawns() / path.getTotalTimeSpent();
         double bestPathEfficiency = bestPath.getTotalLootSpawns() / bestPath.getTotalTimeSpent();
@@ -119,5 +148,9 @@ public class Algorithms {
             return true;
         }
         return false;
+    }
+
+    public static Path getBestPath() {
+        return bestPath;
     }
 }
